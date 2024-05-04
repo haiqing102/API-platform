@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: api-backend
+  profiles:
+    active: prod
+  cloud:
+    nacos:
+      server-addr: xxxxx
+      config:
+        file-extension: yaml

@@ -1,0 +1,10 @@
+server:
+  port: 9002
+  address: 0.0.0.0
+  servlet:
+    context-path: /api/interface
+#-------------------------------------------------
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher

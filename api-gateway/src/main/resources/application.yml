@@ -1,0 +1,37 @@
+server:
+  port: 9000
+  address: 0.0.0.0
+#--------------------------------------
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: api-backend
+          uri: lb://api-backend
+          predicates: Path=/api/backend/**
+        - id: api-interface
+          uri: lb://api-interface
+          predicates: Path=/api/interface/**
+  redis:
+    host: xxxxx
+    port: 6379
+    password: xxxxx
+    database: 0
+#--------------------------------------
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: info
+#--------------------------------------
+dubbo:
+  application:
+    name: api-gateway-dubbo
+    qosEnable: false
+    enable-file-cache: false
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: nacos://xxxxx

@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: api-interface
+  cloud:
+    nacos:
+      server-addr: xxxxx
+      config:
+        file-extension: yaml

@@ -1,0 +1,86 @@
+server:
+  port: 9001
+  address: 0.0.0.0
+  servlet:
+    context-path: /api/backend
+    session:
+      cookie:
+        max-age: 7d #一周
+#-------------------------------------------------------------
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+  session:
+    store-type: redis
+    timeout: 7d #一周
+  redis:
+    host: xxxxx
+    port: 6379
+    database: 0
+    password: xxxxx
+  mail:
+    host: smtp.qq.com
+    username: xxxxx@qq.com
+    password: xxxxx
+    email-from: xxxxx@qq.com
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+#-------------------------------------------------------------
+knife4j:
+  # 开启增强配置
+  enable: true
+  # 开启Swagger的Basic认证功能,默认是false
+  basic:
+    enable: true
+    # Basic认证用户名
+    username: root
+    # Basic认证密码
+    password: root
+#-------------------------------------------------------------
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+#-------------------------------------------------------------
+#腾讯云cos配置
+cos:
+  client:
+    access-key: xxxxx
+    secret-key: xxxxx
+    region: ap-chongqing
+    bucket: api-1320989886
+#-------------------------------------------------------------
+#支付宝支付配置（使用中）
+alipay:
+  app-id: xxxxx
+  seller-id: xxxxx
+  ali-pay-public-key: MIIBIjANBgkqhkiG9wxxxxxCAQEAt32VSa6kjvrF8h3G1tUxxxxxYHs/GB2xxxxxy3UuPle95zxBA2eoqquqP7WTkGIsftxxxxxCCxNetU3trqNIOUdsDCFqMsT2KvBOjSLgD1sPPIbDniSODf7hRsj+Z3QU0l4h+fIkj06D85AvKu74Avoi4/M41H0m8rlw6xxrszIPUYC+f9U/e7pt8TWzB0KueWiQFga0t2s1k2+gXfTKe13HIs1veD7oIvx/P9ynjBd1To7kFbZXa5BhyqO4OhK5lf08hd2NJnWVlWaDAVDuPMsiSilCim0kdRM6gRfOrbNmtptLXJaePew4+wIDAQAB
+  private-key: MIIEvgIvG9w0BAQExxxxxAAoIBAQCsb9MEiiExxxxxi5uEgvLCZ5czkcrZyklz0GaeihmuMdVPcDHkdoBwRxi/EkK2ZxxxxxScYxxxxxT/8HAFM0oe83KzRebwRGhjanpVXLekDx37nbHSdjXJdzZcHkcufPoKVtlpK0tUPVgvSiziSxSRgo+4Z86qhFnz/mTcpm+8pANpQ101KGZ5tVjcfNhTm9a1Si0HU96IuPI5DhQLQxWD3MmGmRqS9HylbYRqo1w5rbIsfht3TjvEyhJZv+9Mhe4W9GbnEyCSrs1ay6J+T8ISmjnp9JuJY4tN0vG1aQxahE/80CCTUncPsBVdYlstlAgMBAAECggEAI9SwsnbJZTauFmtr1dGY8v6FNkhna1gKElCP/MBhbPlA23AhR0JLQsp2fHkTCbblXkQiVOQDTr6hkk8U56N/JSeOboRB+Ua0qgczfn2LP51Xm0T3nCeBjsQvee4N9imSC7j+g7Qjn0FvDFLWGTqQZyykEdvsczPQFfm5RyyqusRo6QEfPCXii2+UtcTsxFvBWhI9mlnxKacAf6EoNs1NJvR3v+sQlesmJEDhuourh1Qzn01a6I/2GnTyQdj9tx8/uPpvH7EtNr0Fyv2vPJ/cPPgznqsVFxCKLrpgRG0XSRWEgZzA+d40zltOTtt//nD4LKcpq0n76xYz+fUQcLnUAQKBgQDYqlD0vTxAMAOdk6j6OIfYN2fHK6zpgIsOrfcYN21PzGzD/XfFGreLN1WK0H9KtAV9l1hqK3iP8zKt/yhOkwPOxTFfC63iEgPp6uhxVPUYx0bAMND3cOBEpjaj9jBOUr7zwVtDD2BS5oY/ezNfMxIECCbCA87v679WJXuq6IRe5QKBgQDLvfSs8MqKL8PNiZwMMQWLf6XwbobGhoSOy7W/clbjejohwjStGMZi2NfJcot9LbYFEigz5m4B8dUVOyZ+27ggBpcO3K/MHzGJcPoPB7fexL+lH21FRsDwPVifqQf0MrQcjEveiYANf/hBhVNjT+Q2UmgZ1qK4N4UnIJBSIg1ygQKBgHGRVL30MxCyGjMOoxQFba83233attfuOPWI2mwnIXUigiB5S75VMsAWURBiGVbe5cHfAskj4B4ULAxoIoiNJwHK+wYG6S4Go2aJay18irxiOAOlkuMgl21kcl+fO9LSLKU4RM3x0Vui2duMiHDuJBNY8nff5yh7Od+95gS/vCLBAoGBAKfhxGVknGA1b5BDndPl6P3DlwaA7IlVepD3hrFUFAipRJFgp2siiQYWS+jwe8QQEHYpOftaGrd7f+tYrCXIAvZQt9RFQI5f/b+U2lfcMkRbttbnCHEXFhBfXFFjROyRgxwq9rFOd7eoBPZoWAfzYsboLGNuGvLUvOE60fD7oj0BAoGBAIIP7e/Z3oNRcMnuEgliDS0kQQwOWe3C45zjKkRSG5kERW9ek/unYmX1AGXDDhpG/ymLgGkoX+0aB6ztxTrR6Cn7ouBMEO9qkQIeku5pDcdjZmuzytxyjM/oO0DddOvyMmp2Y6QFSpCIWUFmCrfVk/hQsUARh4Zn+6VT6ixjco/t
+#-------------------------------------------------------------
+#微信支付配置（未使用）
+wx:
+  pay:
+    app-id: wxxxxxxxxx67e8dc
+    mch-id: 1x0xxxx68
+    api-v3-key: xxxxxbxxx3xxxx3xxx4
+    private-cert-path: classpath:/pem/apiclient_cert.pem
+    private-key-path: classpath:/pem/apiclient_key.pem
+    notify-url: https://api.suki.vin/api/backend/order/notify/order
+#-------------------------------------------------------------
+dubbo:
+  application:
+    name: api-backend-dubbo
+    qosEnable: false
+    enable-file-cache: false
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: nacos://xxxxx
