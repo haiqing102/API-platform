@@ -277,6 +277,8 @@ public class UserController {
 
 		User user = new User();
 		BeanUtils.copyProperties(userUpdateRequest, user);
+		if (StringUtils.isBlank(user.getUserPassword()))
+			user.setUserPassword(null);
 		// 参数校验
 		userService.validUser(user, loginUser, false);
 
