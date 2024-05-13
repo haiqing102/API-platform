@@ -1,6 +1,7 @@
 package edu.cqupt.apibackend.service.impl;
 
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -41,6 +42,8 @@ import static edu.cqupt.apibackend.common.constant.UserConstant.*;
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
+	private static final String EMAIL_PATTERN = "^\\w+(-+.\\w+)*@\\w+(-.\\w+)*.\\w+(-.\\w+)*$";
+
 	@Resource
 	private UserMapper userMapper;
 
@@ -73,16 +76,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 			throw new BusinessException(ResponseCode.PARAMS_ERROR, "昵称过长");
 		}
 		if (userAccount.length() < 4) {
-			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户账号过短");
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户账号过短，不能少于4位");
 		}
-		if (userPassword.length() < 8 || checkPassword.length() < 8) {
-			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户密码过短");
+		if (userPassword.length() < 4 || checkPassword.length() < 4) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户密码过短，不能少于4位");
 		}
-		//  5. 账户不包含特殊字符
-		// 匹配由数字、小写字母、大写字母组成的字符串,且字符串的长度至少为1个字符
+		//  5. 账号和密码不包含特殊字符
+		// 匹配由数字、大小写字母组成的字符串,且字符串的长度至少为1个字符
 		String pattern = "[0-9a-zA-Z]+";
 		if (!userAccount.matches(pattern)) {
-			throw new BusinessException(ResponseCode.PARAMS_ERROR, "账号由数字、小写字母、大写字母组成");
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "账号由数字和大小写字母组成");
+		}
+		if (!userPassword.matches(pattern)) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "密码由数字和大小写字母组成");
 		}
 		// 密码和校验密码相同
 		if (!userPassword.equals(checkPassword)) {
@@ -95,7 +101,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 			queryWrapper.eq(User::getUserAccount, userAccount);
 			long count = userMapper.selectCount(queryWrapper);
 			if (count > 0) {
-				throw new BusinessException(ResponseCode.PARAMS_ERROR, "账号重复");
+				throw new BusinessException(ResponseCode.PARAMS_ERROR, "该账号已被注册");
 			}
 			User invitationCodeUser = null;
 			if (StringUtils.isNotBlank(invitationCode)) {
@@ -143,22 +149,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public long userEmailRegister(UserEmailRegisterRequest userEmailRegisterRequest) {
-		String emailAccount = userEmailRegisterRequest.getEmailAccount();
+		String email = userEmailRegisterRequest.getEmail();
 		String captcha = userEmailRegisterRequest.getCaptcha();
 		String username = userEmailRegisterRequest.getUsername();
 		String invitationCode = userEmailRegisterRequest.getInvitationCode();
 
-		if (StringUtils.isAnyBlank(emailAccount, captcha)) {
+		if (StringUtils.isAnyBlank(email, captcha)) {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR);
 		}
 		if (username.length() > 40) {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR, "昵称过长");
 		}
-		String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-		if (!Pattern.matches(emailPattern, emailAccount)) {
-			throw new BusinessException(ResponseCode.PARAMS_ERROR, "不合法的邮箱地址！");
+		if (!Pattern.matches(EMAIL_PATTERN, email)) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "不合法的邮箱地址");
 		}
-		String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
+		String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + email);
 		if (StringUtils.isBlank(cacheCaptcha)) {
 			throw new BusinessException(ResponseCode.OPERATION_ERROR, "验证码已过期,请重新获取");
 		}
@@ -166,14 +171,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 		if (!cacheCaptcha.equals(captcha)) {
 			throw new BusinessException(ResponseCode.OPERATION_ERROR, "验证码输入有误");
 		}
-		String redissonLock = ("userEmailRegister_" + emailAccount).intern();
+		String redissonLock = ("userEmailRegister_" + email).intern();
 		return redissonLockUtil.redissonDistributedLocks(redissonLock, () -> {
-			// 账户不能重复
+			// 邮箱不能重复
 			LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-			queryWrapper.eq(User::getUserAccount, emailAccount);
+			queryWrapper.eq(User::getEmail, email);
 			long count = userMapper.selectCount(queryWrapper);
 			if (count > 0) {
-				throw new BusinessException(ResponseCode.PARAMS_ERROR, "账号重复");
+				throw new BusinessException(ResponseCode.PARAMS_ERROR, "该邮箱已被注册");
 			}
 			User invitationCodeUser = null;
 			if (StringUtils.isNotBlank(invitationCode)) {
@@ -191,10 +196,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 			// 3. 插入数据
 			User user = new User();
-			user.setUserAccount(emailAccount);
 			user.setUsername(username);
+			user.setEmail(email);
 			user.setAccessKey(accessKey);
-			user.setEmail(emailAccount);
 			user.setSecretKey(secretKey);
 			if (invitationCodeUser != null) {
 				user.setBalance(100);
@@ -225,16 +229,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 			throw new BusinessException(ResponseCode.PARAMS_ERROR, "参数为空");
 		}
 		if (userAccount.length() < 4) {
-			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户账号过短,不能小于4位");
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户账号过短,不能少于4位");
 		}
-		if (userPassword.length() < 8) {
-			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户密码过短,不能低于8位字符");
+		if (userPassword.length() < 4) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户密码过短,不能少于4位");
 		}
 		//  5. 账户不包含特殊字符
-		// 匹配由数字、小写字母、大写字母组成的字符串,且字符串的长度至少为1个字符
+		// 匹配由数字、字母组成的字符串,且字符串的长度至少为1个字符
 		String pattern = "[0-9a-zA-Z]+";
-		if (!userAccount.matches(pattern)) {
-			throw new BusinessException(ResponseCode.PARAMS_ERROR, "账号需由数字、小写字母、大写字母组成");
+		if (!userAccount.matches(pattern) && !userAccount.matches(EMAIL_PATTERN)) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "账号由数字和大小写字母组成");
+		}
+		if (!userPassword.matches(pattern)) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "密码由数字和大小写字母组成");
 		}
 		// 2. 加密
 		String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
@@ -245,7 +252,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 		User user = userMapper.selectOne(queryWrapper);
 		// 用户不存在
 		if (user == null) {
-			log.info("user login failed, userAccount cannot match userPassword");
 			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户不存在或密码错误");
 		}
 		if (user.getStatus().equals(UserAccountStatusEnum.BAN.getValue())) {
@@ -267,17 +273,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 	 */
 	@Override
 	public UserVo userEmailLogin(UserEmailLoginRequest userEmailLoginRequest, HttpServletRequest request) {
-		String emailAccount = userEmailLoginRequest.getEmailAccount();
+		String email = userEmailLoginRequest.getEmail();
 		String captcha = userEmailLoginRequest.getCaptcha();
 
-		if (StringUtils.isAnyBlank(emailAccount, captcha)) {
+		if (StringUtils.isAnyBlank(email, captcha)) {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR);
 		}
-		String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-		if (!Pattern.matches(emailPattern, emailAccount)) {
+		if (!Pattern.matches(EMAIL_PATTERN, email)) {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR, "不合法的邮箱地址！");
 		}
-		String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
+		String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + email);
 		if (StringUtils.isBlank(cacheCaptcha)) {
 			throw new BusinessException(ResponseCode.OPERATION_ERROR, "验证码已过期,请重新获取");
 		}
@@ -287,12 +292,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 		}
 		// 查询用户是否存在
 		QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("email", emailAccount);
+		queryWrapper.eq("email", email);
 		User user = userMapper.selectOne(queryWrapper);
 
 		// 用户不存在
 		if (user == null) {
-			throw new BusinessException(ResponseCode.OPERATION_ERROR, "该邮箱未绑定账号，请先绑定账号");
+			throw new BusinessException(ResponseCode.OPERATION_ERROR, "该邮箱尚未注册，请前往注册~");
 		}
 
 		if (user.getStatus().equals(UserAccountStatusEnum.BAN.getValue())) {
@@ -307,16 +312,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 	@Override
 	public UserVo userBindEmail(UserBindEmailRequest userEmailLoginRequest, HttpServletRequest request) {
-		String emailAccount = userEmailLoginRequest.getEmailAccount();
+		String email = userEmailLoginRequest.getEmail();
 		String captcha = userEmailLoginRequest.getCaptcha();
-		if (StringUtils.isAnyBlank(emailAccount, captcha)) {
+		if (StringUtils.isAnyBlank(email, captcha)) {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR);
 		}
-		String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-		if (!Pattern.matches(emailPattern, emailAccount)) {
+		if (!Pattern.matches(EMAIL_PATTERN, email)) {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR, "不合法的邮箱地址！");
 		}
-		String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
+		String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + email);
 		if (StringUtils.isBlank(cacheCaptcha)) {
 			throw new BusinessException(ResponseCode.OPERATION_ERROR, "验证码已过期,请重新获取");
 		}
@@ -326,62 +330,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 		}
 		// 查询用户是否绑定该邮箱
 		UserVo loginUser = this.getLoginUser(request);
-		if (loginUser.getEmail() != null && emailAccount.equals(loginUser.getEmail())) {
+		if (loginUser.getEmail() != null && email.equals(loginUser.getEmail())) {
 			throw new BusinessException(ResponseCode.OPERATION_ERROR, "该账号已绑定此邮箱,请更换新的邮箱！");
 		}
 		// 查询邮箱是否已经绑定
 		QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("email", emailAccount);
+		queryWrapper.eq("email", email);
 		User user = this.getOne(queryWrapper);
 		if (user != null) {
 			throw new BusinessException(ResponseCode.OPERATION_ERROR, "此邮箱已被绑定,请更换新的邮箱！");
 		}
 		user = new User();
 		user.setId(loginUser.getId());
-		user.setEmail(emailAccount);
+		user.setEmail(email);
 		boolean bindEmailResult = this.updateById(user);
 		if (!bindEmailResult) {
 			throw new BusinessException(ResponseCode.OPERATION_ERROR, "邮箱绑定失败,请稍后再试！");
 		}
-		loginUser.setEmail(emailAccount);
-		return loginUser;
-	}
-
-	@Override
-	public UserVo userUnBindEmail(UserUnBindEmailRequest userUnBindEmailRequest, HttpServletRequest request) {
-		String emailAccount = userUnBindEmailRequest.getEmailAccount();
-		String captcha = userUnBindEmailRequest.getCaptcha();
-		if (StringUtils.isAnyBlank(emailAccount, captcha)) {
-			throw new BusinessException(ResponseCode.PARAMS_ERROR);
-		}
-		String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-		if (!Pattern.matches(emailPattern, emailAccount)) {
-			throw new BusinessException(ResponseCode.PARAMS_ERROR, "不合法的邮箱地址！");
-		}
-		String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
-		if (StringUtils.isBlank(cacheCaptcha)) {
-			throw new BusinessException(ResponseCode.OPERATION_ERROR, "验证码已过期,请重新获取");
-		}
-		captcha = captcha.trim();
-		if (!cacheCaptcha.equals(captcha)) {
-			throw new BusinessException(ResponseCode.OPERATION_ERROR, "验证码输入有误");
-		}
-		// 查询用户是否绑定该邮箱
-		UserVo loginUser = this.getLoginUser(request);
-		if (loginUser.getEmail() == null) {
-			throw new BusinessException(ResponseCode.OPERATION_ERROR, "该账号未绑定邮箱");
-		}
-		if (!emailAccount.equals(loginUser.getEmail())) {
-			throw new BusinessException(ResponseCode.OPERATION_ERROR, "该账号未绑定此邮箱");
-		}
-		User user = new User();
-		user.setId(loginUser.getId());
-		user.setEmail("");
-		boolean bindEmailResult = this.updateById(user);
-		if (!bindEmailResult) {
-			throw new BusinessException(ResponseCode.OPERATION_ERROR, "邮箱解绑失败,请稍后再试！");
-		}
-		loginUser.setEmail(null);
+		loginUser.setEmail(email);
 		return loginUser;
 	}
 
@@ -394,12 +360,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 	@Override
 	public UserVo getLoginUser(HttpServletRequest request) {
 		// 先判断是否已登录
-		Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-		UserVo currentUser = (UserVo) userObj;
-		if (currentUser == null || currentUser.getId() == null) {
+		UserVo loginUser = (UserVo) request.getSession().getAttribute(USER_LOGIN_STATE);
+		if (loginUser == null || loginUser.getId() == null) {
 			throw new BusinessException(403, "使用游客身份访问");
 		}
-		return currentUser;
+		User user = getById(loginUser.getId());
+		BeanUtil.copyProperties(user, loginUser);
+		return loginUser;
 	}
 
 	/**
@@ -450,7 +417,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 	}
 
 	@Override
-	public void validUser(User user, boolean add) {
+	public void validUser(User user, UserVo loginUser, boolean add) {
 		if (user == null) {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR);
 		}
@@ -466,11 +433,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 			// 添加用户生成8位邀请码
 			user.setInvitationCode(generateRandomString(8));
 		}
+
+		if (userAccount != null && userAccount.length() < 4) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户账号过短,不能少于4位");
+		}
+		if (userPassword != null && userPassword.length() < 4) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户密码过短,不能少于4位");
+		}
 		//  5. 账户不包含特殊字符
-		// 匹配由数字、小写字母、大写字母组成的字符串,且字符串的长度至少为1个字符
+		// 匹配由数字、字母组成的字符串,且字符串的长度至少为1个字符
 		String pattern = "[0-9a-zA-Z]+";
 		if (StringUtils.isNotBlank(userAccount) && !userAccount.matches(pattern)) {
-			throw new BusinessException(ResponseCode.PARAMS_ERROR, "账号由数字、小写字母、大写字母组成");
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "账号由数字和大小写字母组成");
+		}
+		if (StringUtils.isNotBlank(userPassword) && !userPassword.matches(pattern)) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "密码由数字和大小写字母组成");
 		}
 		if (ObjectUtils.isNotEmpty(balance) && balance < 0) {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR, "钱包余额不能为负数");
@@ -484,8 +461,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 			LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
 			queryWrapper.eq(User::getUserAccount, userAccount);
 			long count = userMapper.selectCount(queryWrapper);
-			if (count > 0) {
-				throw new BusinessException(ResponseCode.PARAMS_ERROR, "账号重复");
+
+			if (count > 0 && !loginUser.getUserAccount().equals(user.getUserAccount())) {
+				throw new BusinessException(ResponseCode.PARAMS_ERROR, "该账号已被绑定");
 			}
 		}
 	}

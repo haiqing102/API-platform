@@ -1,10 +1,8 @@
 package edu.cqupt.apiinterface.controller;
 
 import cn.hutool.json.JSONUtil;
-import com.google.gson.Gson;
 import edu.cqupt.apicommon.common.exception.BusinessException;
-import edu.cqupt.apicommon.model.dto.interfaceinfo.MusicInfo;
-import edu.cqupt.apiinterface.util.RequestUtil;
+import edu.cqupt.apicommon.model.dto.interfaceinfo.MusicDTO;
 import edu.cqupt.apiinterface.util.ResponseUtil;
 import edu.cqupt.apisdk.model.params.HoroscopeParams;
 import edu.cqupt.apisdk.model.params.IpInfoParams;
@@ -15,7 +13,6 @@ import edu.cqupt.apisdk.model.response.ResultResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -27,27 +24,19 @@ import static edu.cqupt.apiinterface.util.RequestUtil.get;
 import static edu.cqupt.apiinterface.util.ResponseUtil.responseToMap;
 
 @Slf4j
-@RestController
-public class InterfaceController {
+//@RestController
+public class InterfaceControllerDev {
 
-	/**
-	 * 土味情话
-	 */
-	@GetMapping("/loveTalk")
-	public String randomLoveTalk() {
-		return RequestUtil.get("https://api.vvhan.com/api/text/love");
-	}
-
-	/**
-	 * 幽默段子
+	/*
+	 *幽默段子
 	 */
 	@GetMapping("/poisonousChickenSoup")
 	public String getPoisonousChickenSoup() {
-		return RequestUtil.get("https://api.btstu.cn/yan/api.php?charset=utf-8&encode=json");
+		return get("https://api.btstu.cn/yan/api.php?charset=utf-8&encode=json");
 	}
 
-	/**
-	 * 随机壁纸
+	/*
+	 *随机壁纸
 	 */
 	@GetMapping("/randomWallpaper")
 	public RandomWallpaperResponse randomWallpaper(RandomWallpaperParams randomWallpaperParams) throws BusinessException {
@@ -63,12 +52,22 @@ public class InterfaceController {
 		return JSONUtil.toBean(get(url), RandomWallpaperResponse.class);
 	}
 
-	/**
-	 * 星座运势
+	/*
+	 *土味情话
+	 */
+	@GetMapping("/loveTalk")
+
+	public String randomLoveTalk() {
+		return get("https://39.107.79.226/api/interface/loveTalk");
+	}
+
+	/*
+	 *星座运势
 	 */
 	@GetMapping("/horoscope")
-	public ResultResponse getHoroscope(HoroscopeParams horoscopeParams) throws BusinessException {
-		String response = get("https://api.vvhan.com/api/horoscope", horoscopeParams);
+
+	public ResultResponse getHoroscope(HoroscopeParams horoscopeParams) {
+		String response = get("https://39.107.79.226/api/interface/horoscope", horoscopeParams);
 		Map<String, Object> fromResponse = responseToMap(response);
 		boolean success = (boolean) fromResponse.get("success");
 		if (!success) {
@@ -80,67 +79,68 @@ public class InterfaceController {
 	}
 
 	/*
+	 *
 	 *IP归属地
 	 */
 	@GetMapping("/ipInfo")
+
 	public ResultResponse getIpInfo(IpInfoParams ipInfoParams) {
-		return ResponseUtil.baseResponse("https://api.vvhan.com/api/ipInfo", ipInfoParams);
+		return ResponseUtil.baseResponse("https://39.107.79.226/api/interface/ipInfo", ipInfoParams);
 	}
 
-	/**
-	 * 天气查询
+	/*
+	 *
+	 *天气查询
 	 */
 	@GetMapping("/weather")
+
 	public ResultResponse getWeatherInfo(WeatherParams weatherParams) {
-		if (StringUtils.isAllBlank(weatherParams.getIp(), weatherParams.getCity(), weatherParams.getType())) {
-			return ResponseUtil.baseResponse("https://api.vvhan.com/api/weather?ip=183.230.12.201", weatherParams);
-		} else {
-			return ResponseUtil.baseResponse("https://api.vvhan.com/api/weather", weatherParams);
-		}
+		return ResponseUtil.baseResponse("https://39.107.79.226/api/interface/weather", weatherParams);
 	}
 
-	/**
-	 * 网易云Hot
+	/*
+	 *
+	 *网易云Hot
 	 */
 	@GetMapping("/wyHotMusic")
-	public ResultResponse getHotMusic() throws IOException {
+	public String getHotMusic() throws IOException {
 		// 测试音乐是否可以播放
-		String location;
-		ResultResponse response;
+		String musicJson, location;
 		do {
-			response = ResponseUtil.baseResponse("https://api.vvhan.com/api/wyMusic/热歌榜?type=json", null);
-			String musicInfoJson = new Gson().toJson(response.getData().get("info"));
-			MusicInfo musicInfo = new Gson().fromJson(musicInfoJson, MusicInfo.class);
-			URL url = new URL(musicInfo.getUrl());
+			musicJson = get("https://39.107.79.226/api/interface/wyHotMusic");
+			MusicDTO musicDTO = JSONUtil.toBean(musicJson, MusicDTO.class);
+			URL url = new URL(musicDTO.getInfo().getUrl());
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			location = con.getHeaderField("Location");
+			log.info("location={}", location);
 		} while (location.equals("http://music.163.com/404"));
 
-		return response;
+		return musicJson;
 	}
 
-	/**
-	 * 动漫头像
+	/*
+	 *
+	 *动漫头像
 	 */
 	@GetMapping("/cartoonAvatar")
-	public ResultResponse getCartoonAvatar() {
-		return ResponseUtil.baseResponse("https://api.vvhan.com/api/avatar/dm?type=json", null);
+	public String getCartoonAvatar() {
+		return get("https://39.107.79.226/api/interface/cartoonAvatar");
 	}
 
 	/**
 	 * 职场人日历
 	 */
 	@GetMapping("/calendar")
-	public ResultResponse getCalendar() {
-		return ResponseUtil.baseResponse("https://api.vvhan.com/api/zhichang?type=json", null);
+	public String getCalendar() {
+		return get("https://39.107.79.226/api/interface/calendar");
 	}
 
 	/**
 	 * 手机号归属地
 	 */
 	@GetMapping("/phoneInfo")
-	public ResultResponse getPhoneInfo(String phone) {
-		return ResponseUtil.baseResponse("https://api.vvhan.com/api/phone/" + phone, null);
+	public String getPhoneInfo(String phone) {
+		return get("https://39.107.79.226/api/interface/phoneInfo?phone=" + phone);
 	}
 
 }

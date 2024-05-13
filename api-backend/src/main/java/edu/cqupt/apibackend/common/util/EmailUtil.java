@@ -109,20 +109,20 @@ public class EmailUtil {
 	/**
 	 * 发送支付成功电子邮件
 	 *
-	 * @param emailAccount 电子邮件帐户
+	 * @param email 电子邮件帐户
 	 * @param mailSender   邮件发件人
 	 * @param emailConfig  电子邮件配置
 	 * @param orderName    订单名称
 	 * @param orderTotal   订单总额
 	 * @throws MessagingException 消息传递异常
 	 */
-	public void sendPaySuccessEmail(String emailAccount, JavaMailSender mailSender, EmailConfig emailConfig, String orderName, String orderTotal) throws MessagingException {
+	public void sendPaySuccessEmail(String email, JavaMailSender mailSender, EmailConfig emailConfig, String orderName, String orderTotal) throws MessagingException {
 		MimeMessage message = mailSender.createMimeMessage();
 		// 邮箱发送内容组成
 		MimeMessageHelper helper = new MimeMessageHelper(message, true);
 		helper.setSubject("购买通知");
 		helper.setText(buildPaySuccessEmailContent(EMAIL_HTML_PAY_SUCCESS_PATH, orderName, orderTotal), true);
-		helper.setTo(emailAccount);
+		helper.setTo(email);
 		helper.setFrom(EMAIL_TITLE + '<' + emailConfig.getEmailFrom() + '>');
 		mailSender.send(message);
 	}

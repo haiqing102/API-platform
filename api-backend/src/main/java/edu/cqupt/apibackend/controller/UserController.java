@@ -27,6 +27,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -39,7 +40,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static edu.cqupt.apibackend.common.constant.EmailConstant.*;
-import static edu.cqupt.apibackend.common.constant.UserConstant.ADMIN_ROLE;
+import static edu.cqupt.apibackend.common.constant.UserConstant.*;
 import static edu.cqupt.apibackend.common.util.EmailUtil.buildEmailContent;
 
 @Slf4j
@@ -62,22 +63,22 @@ public class UserController {
 	/**
 	 * 获取验证码
 	 *
-	 * @param emailAccount 电子邮件帐户
+	 * @param email 电子邮件帐户
 	 * @return {@link BaseResponse}<{@link String}>
 	 */
 	@GetMapping("/getCaptcha")
-	public BaseResponse<Boolean> getCaptcha(String emailAccount) {
-		if (StringUtils.isBlank(emailAccount)) {
+	public BaseResponse<Boolean> getCaptcha(String email) {
+		if (StringUtils.isBlank(email)) {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR);
 		}
 		String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-		if (!Pattern.matches(emailPattern, emailAccount)) {
+		if (!Pattern.matches(emailPattern, email)) {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR, "不合法的邮箱地址！");
 		}
 		String captcha = RandomUtil.randomNumbers(6);
 		try {
-			sendEmail(emailAccount, captcha);
-			redisTemplate.opsForValue().set(CAPTCHA_CACHE_KEY + emailAccount, captcha, 5, TimeUnit.MINUTES);
+			sendEmail(email, captcha);
+			redisTemplate.opsForValue().set(CAPTCHA_CACHE_KEY + email, captcha, 5, TimeUnit.MINUTES);
 			return ResponseUtil.success(true);
 		} catch (Exception e) {
 			log.error("【发送验证码失败】" + e.getMessage());
@@ -88,13 +89,13 @@ public class UserController {
 	/**
 	 * 发送邮件
 	 */
-	private void sendEmail(String emailAccount, String captcha) throws MessagingException {
+	private void sendEmail(String email, String captcha) throws MessagingException {
 		MimeMessage message = mailSender.createMimeMessage();
 		// 邮箱发送内容组成
 		MimeMessageHelper helper = new MimeMessageHelper(message, true);
 		helper.setSubject(EMAIL_SUBJECT);
 		helper.setText(buildEmailContent(EMAIL_HTML_CONTENT_PATH, captcha), true);
-		helper.setTo(emailAccount);
+		helper.setTo(email);
 		helper.setFrom(EMAIL_TITLE + '<' + emailConfig.getEmailFrom() + '>');
 		mailSender.send(message);
 	}
@@ -123,7 +124,7 @@ public class UserController {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR);
 		}
 		long result = userService.userEmailRegister(userEmailRegisterRequest);
-		redisTemplate.delete(CAPTCHA_CACHE_KEY + userEmailRegisterRequest.getEmailAccount());
+		redisTemplate.delete(CAPTCHA_CACHE_KEY + userEmailRegisterRequest.getEmail());
 		return ResponseUtil.success(result);
 	}
 
@@ -153,7 +154,7 @@ public class UserController {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR);
 		}
 		UserVo user = userService.userEmailLogin(userEmailLoginRequest, request);
-		redisTemplate.delete(CAPTCHA_CACHE_KEY + userEmailLoginRequest.getEmailAccount());
+		redisTemplate.delete(CAPTCHA_CACHE_KEY + userEmailLoginRequest.getEmail());
 		return ResponseUtil.success(user);
 	}
 
@@ -166,9 +167,7 @@ public class UserController {
 	@GetMapping("/get/login")
 	public BaseResponse<UserVo> getLoginUser(HttpServletRequest request) {
 		UserVo user = userService.getLoginUser(request);
-		UserVo userVo = new UserVo();
-		BeanUtils.copyProperties(user, userVo);
-		return ResponseUtil.success(userVo);
+		return ResponseUtil.success(user);
 	}
 
 	/**
@@ -199,24 +198,7 @@ public class UserController {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR);
 		}
 		UserVo user = userService.userBindEmail(userBindEmailRequest, request);
-		redisTemplate.delete(CAPTCHA_CACHE_KEY + userBindEmailRequest.getEmailAccount());
-		return ResponseUtil.success(user);
-	}
-
-	/**
-	 * 用户取消绑定电子邮件
-	 *
-	 * @param request                请求
-	 * @param userUnBindEmailRequest 用户取消绑定电子邮件请求
-	 * @return {@link BaseResponse}<{@link UserVo}>
-	 */
-	@PostMapping("/unbindEmail")
-	public BaseResponse<UserVo> userUnBindEmail(@RequestBody UserUnBindEmailRequest userUnBindEmailRequest, HttpServletRequest request) {
-		if (userUnBindEmailRequest == null) {
-			throw new BusinessException(ResponseCode.PARAMS_ERROR);
-		}
-		UserVo user = userService.userUnBindEmail(userUnBindEmailRequest, request);
-		redisTemplate.delete(CAPTCHA_CACHE_KEY + userUnBindEmailRequest.getEmailAccount());
+		redisTemplate.delete(CAPTCHA_CACHE_KEY + userBindEmailRequest.getEmail());
 		return ResponseUtil.success(user);
 	}
 
@@ -237,8 +219,9 @@ public class UserController {
 		}
 		User user = new User();
 		BeanUtils.copyProperties(userAddRequest, user);
+		UserVo loginUser = (UserVo) request.getSession().getAttribute(USER_LOGIN_STATE);
 		// 校验
-		userService.validUser(user, true);
+		userService.validUser(user, loginUser, true);
 
 		boolean result = userService.save(user);
 		if (!result) {
@@ -295,7 +278,7 @@ public class UserController {
 		User user = new User();
 		BeanUtils.copyProperties(userUpdateRequest, user);
 		// 参数校验
-		userService.validUser(user, false);
+		userService.validUser(user, loginUser, false);
 
 		LambdaUpdateWrapper<User> userLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
 		userLambdaUpdateWrapper.eq(User::getId, user.getId());
@@ -306,6 +289,44 @@ public class UserController {
 		}
 		UserVo userVo = new UserVo();
 		BeanUtils.copyProperties(userService.getById(user.getId()), userVo);
+		return ResponseUtil.success(userVo);
+	}
+
+	@PostMapping("/updatePwd")
+	public BaseResponse<UserVo> updatePwd(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
+		if (userUpdateRequest == null) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR);
+		}
+		// 校验是否登录
+		UserVo loginUser = userService.getLoginUser(request);
+		if (loginUser == null)
+			throw new BusinessException(ResponseCode.NOT_LOGIN_ERROR);
+
+		User user = new User();
+		BeanUtils.copyProperties(userUpdateRequest, user);
+
+		// 参数校验
+		if (user.getUserPassword() == null)
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "密码不能为空");
+		if (user.getUserPassword().length() < 4) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "用户密码过短,不能少于4位");
+		}
+		String pattern = "[0-9a-zA-Z]+";
+		if (!user.getUserPassword().matches(pattern)) {
+			throw new BusinessException(ResponseCode.PARAMS_ERROR, "密码由数字和大小写字母组成");
+		}
+		// 加密
+		String encryptPassword = DigestUtils.md5DigestAsHex((SALT + user.getUserPassword()).getBytes());
+		user.setUserPassword(encryptPassword);
+		// 更新密码
+		LambdaUpdateWrapper<User> userLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+		userLambdaUpdateWrapper.eq(User::getId, loginUser.getId());
+		boolean result = userService.update(user, userLambdaUpdateWrapper);
+		if (!result) {
+			throw new BusinessException(ResponseCode.OPERATION_ERROR, "更新失败");
+		}
+		UserVo userVo = new UserVo();
+		BeanUtils.copyProperties(userService.getById(loginUser.getId()), userVo);
 		return ResponseUtil.success(userVo);
 	}
 

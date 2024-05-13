@@ -6,7 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 @Slf4j
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class},
+		scanBasePackages = {"edu.cqupt.apiinterface", "edu.cqupt.apicommon.common.exception"}
+)
 public class ApiInterfaceApplication {
 
 	public static void main(String[] args) {

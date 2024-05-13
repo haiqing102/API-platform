@@ -21,7 +21,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				.excludePathPatterns("/user/get/invitationCode")
 				.excludePathPatterns("/interfaceInfo/list/page")
 				.excludePathPatterns("/interfaceInfo/get")
-				.excludePathPatterns("/interfaceInfo/get/searchText");
+				.excludePathPatterns("/interfaceInfo/get/searchText")
+				.excludePathPatterns("/order/notify/order");
 	}
 
 }

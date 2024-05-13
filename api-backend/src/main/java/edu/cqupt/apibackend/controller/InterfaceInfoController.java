@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static edu.cqupt.apibackend.common.constant.UserConstant.ADMIN_ROLE;
+import static edu.cqupt.apicommon.common.enums.ResponseCode.OPERATION_ERROR;
 
 @RestController
 @RequestMapping("/interfaceInfo")
@@ -86,7 +87,7 @@ public class InterfaceInfoController {
 		interfaceInfo.setUserId(loginUser.getId());
 		boolean result = interfaceInfoService.save(interfaceInfo);
 		if (!result) {
-			throw new BusinessException(ResponseCode.OPERATION_ERROR);
+			throw new BusinessException(OPERATION_ERROR);
 		}
 		long newInterfaceInfoId = interfaceInfo.getId();
 		return ResponseUtil.success(newInterfaceInfoId);
@@ -369,6 +370,10 @@ public class InterfaceInfoController {
 		if (interfaceInfo.getStatus() != InterfaceStatusEnum.ONLINE.getValue()) {
 			throw new BusinessException(ResponseCode.PARAMS_ERROR, "接口未开启");
 		}
+		UserVo loginUser = userService.getLoginUser(request);
+		if (loginUser.getBalance() < interfaceInfo.getReduceScore()) {
+			throw new BusinessException(50001, "余额不足，请先充值。");
+		}
 		// 构建请求参数
 		List<InvokeRequest.Field> fieldList = invokeRequest.getRequestParams();
 		String requestParams = "{}";
@@ -382,7 +387,6 @@ public class InterfaceInfoController {
 		}
 		Map<String, Object> params = new Gson().fromJson(requestParams, new TypeToken<Map<String, Object>>() {
 		}.getType());
-		UserVo loginUser = userService.getLoginUser(request);
 		String accessKey = loginUser.getAccessKey();
 		String secretKey = loginUser.getSecretKey();
 		try {
@@ -391,10 +395,15 @@ public class InterfaceInfoController {
 			currencyRequest.setMethod(interfaceInfo.getMethod());
 			currencyRequest.setPath(interfaceInfo.getUrl());
 			currencyRequest.setRequestParams(params);
+
 			ResultResponse response = apiService.request(apiClient, currencyRequest);
-			if (response.getData() == null)
-				return ResponseUtil.error(ResponseCode.PARAMS_ERROR);
-			return ResponseUtil.success(response.getData());
+			Map<String, Object> data = response.getData();
+
+			// 处理网关抛出的异常
+			if (data.get("code") != null && (double) data.get("code") == 500)
+				return ResponseUtil.error(OPERATION_ERROR, (String) data.get("message"));
+
+			return ResponseUtil.success(data);
 		} catch (Exception e) {
 			throw new BusinessException(ResponseCode.SYSTEM_ERROR, e.getMessage());
 		}

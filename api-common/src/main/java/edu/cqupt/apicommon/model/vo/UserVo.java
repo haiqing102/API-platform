@@ -43,6 +43,11 @@ public class UserVo implements Serializable {
 	private String userAccount;
 
 	/**
+	 * 密码
+	 */
+	private String userPassword;
+
+	/**
 	 * 用户头像
 	 */
 	private String userAvatar;

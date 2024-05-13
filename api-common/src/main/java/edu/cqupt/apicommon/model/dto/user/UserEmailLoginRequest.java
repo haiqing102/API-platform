@@ -9,7 +9,7 @@ public class UserEmailLoginRequest implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String emailAccount;
+	private String email;
 
 	private String captcha;
 

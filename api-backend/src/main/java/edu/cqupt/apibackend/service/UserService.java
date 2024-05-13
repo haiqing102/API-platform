@@ -77,7 +77,7 @@ public interface UserService extends IService<User> {
      * @param add  是否为创建校验
      * @param user 接口信息
      */
-    void validUser(User user, boolean add);
+    void validUser(User user, UserVo loginUser, boolean add);
 
     /**
      * 更新凭证
@@ -124,12 +124,4 @@ public interface UserService extends IService<User> {
      */
     UserVo userBindEmail(UserBindEmailRequest userEmailLoginRequest, HttpServletRequest request);
 
-    /**
-     * 用户取消绑定电子邮件
-     *
-     * @param request                要求
-     * @param userUnBindEmailRequest 用户取消绑定电子邮件请求
-     * @return {@link UserVo}
-     */
-    UserVo userUnBindEmail(UserUnBindEmailRequest userUnBindEmailRequest, HttpServletRequest request);
 }

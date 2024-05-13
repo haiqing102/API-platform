@@ -20,7 +20,10 @@ public class ResponseUtil {
 	public static <T> ResultResponse baseResponse(String baseUrl, T params) {
 		String response = null;
 		try {
-			response = get(baseUrl, params);
+			if (params == null)
+				response = get(baseUrl);
+			else
+				response = get(baseUrl, params);
 			Map<String, Object> fromResponse = responseToMap(response);
 			boolean success = (boolean) fromResponse.get("success");
 			ResultResponse baseResponse = new ResultResponse();

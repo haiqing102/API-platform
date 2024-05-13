@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://xxxxx/api_platform?useSSL=false
+    url: jdbc:mysql://xxxxx:3306/api_platform?useSSL=false
     password: xxxxx
 #--------------------------------------------------------------
 #客户端SDK配置

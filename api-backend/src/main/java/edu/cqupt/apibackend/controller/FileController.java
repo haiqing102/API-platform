@@ -32,7 +32,7 @@ import java.util.Arrays;
 @RequestMapping("/file")
 @Slf4j
 public class FileController {
-	final long ONE_M = 1024 * 1024L;
+	final long TEN_M = 1024 * 1024 * 10L;
 	@Resource
 	private UserService userService;
 	@Resource
@@ -111,8 +111,8 @@ public class FileController {
 		// 文件后缀
 		String fileSuffix = FileUtil.getSuffix(multipartFile.getOriginalFilename());
 		if (FileUploadBizEnum.USER_AVATAR.equals(fileUploadBizEnum)) {
-			if (fileSize > ONE_M) {
-				return "文件大小不能超过 1M";
+			if (fileSize > TEN_M) {
+				return "文件大小不能超过 10M";
 			}
 			if (!Arrays.asList("jpeg", "jpg", "svg", "png", "webp", "jiff").contains(fileSuffix)) {
 				return "文件类型错误";
