@@ -355,6 +355,7 @@ public class UserController {
 	 * @param request          请求
 	 * @return {@link BaseResponse}<{@link List}<{@link UserVo}>>
 	 */
+	@AuthCheck(mustRole = ADMIN_ROLE)
 	@GetMapping("/list")
 	public BaseResponse<List<UserVo>> listUser(UserQueryRequest userQueryRequest, HttpServletRequest request) {
 		if (null == userQueryRequest) {
@@ -380,6 +381,7 @@ public class UserController {
 	 * @param request          请求
 	 * @return {@link BaseResponse}<{@link Page}<{@link UserVo}>>
 	 */
+	@AuthCheck(mustRole = ADMIN_ROLE)
 	@GetMapping("/list/page")
 	public BaseResponse<Page<UserVo>> listUserByPage(UserQueryRequest userQueryRequest, HttpServletRequest request) {
 		User userQuery = new User();

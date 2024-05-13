@@ -48,10 +48,10 @@ public class ProductInfoController {
     // region 增删改查
 
     /**
-     * 添加接口信息
+     * 添加商品信息
      * 创建
      *
-     * @param productInfoAddRequest 接口信息添加请求
+     * @param productInfoAddRequest 商品信息添加请求
      * @param request               请求
      * @return {@link BaseResponse}<{@link Long}>
      */
@@ -76,7 +76,7 @@ public class ProductInfoController {
     }
 
     /**
-     * 删除接口信息
+     * 删除商品信息
      *
      * @param deleteRequest 删除请求
      * @param request       请求
@@ -104,10 +104,10 @@ public class ProductInfoController {
     }
 
     /**
-     * 更新接口信息
+     * 更新商品信息
      * 更新
      *
-     * @param productInfoUpdateRequest 接口信息更新请求
+     * @param productInfoUpdateRequest 商品信息更新请求
      * @param request                  请求
      * @return {@link BaseResponse}<{@link Boolean}>
      */
@@ -139,7 +139,7 @@ public class ProductInfoController {
     }
 
     /**
-     * 通过id获取接口信息
+     * 通过id获取商品信息
      *
      * @param id id
      * @return {@link BaseResponse}<{@link ProductInfo}>
@@ -156,7 +156,7 @@ public class ProductInfoController {
     /**
      * 获取列表（仅管理员可使用）
      *
-     * @param productInfoQueryRequest 接口信息查询请求
+     * @param productInfoQueryRequest 商品信息查询请求
      * @return {@link BaseResponse}<{@link List}<{@link ProductInfo}>>
      */
     @AuthCheck(mustRole = ADMIN_ROLE)
@@ -176,7 +176,7 @@ public class ProductInfoController {
     /**
      * 分页获取列表
      *
-     * @param productInfoQueryRequest 接口信息查询请求
+     * @param productInfoQueryRequest 商品信息查询请求
      * @param request                 请求
      * @return {@link BaseResponse}<{@link Page}<{@link ProductInfo}>>
      */
@@ -223,7 +223,7 @@ public class ProductInfoController {
     /**
      * 分页获取列表
      *
-     * @param productInfoQueryRequest 接口信息查询请求
+     * @param productInfoQueryRequest 商品信息查询请求
      * @param request                 请求
      * @return {@link BaseResponse}<{@link Page}<{@link ProductInfo}>>
      */
