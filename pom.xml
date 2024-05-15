@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>edu.cqupt</groupId>
+    <groupId>vin.suki</groupId>
     <artifactId>api-platform</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
@@ -32,7 +32,7 @@
         <cos_api.version>5.6.97</cos_api.version>
         <knife4j.version>3.0.3</knife4j.version>
         <hutool-all.version>5.8.16</hutool-all.version>
-        <api-sdk.version>1.0.2</api-sdk.version>
+        <api-sdk.version>1.0.3</api-sdk.version>
     </properties>
 
     <dependencyManagement>
@@ -109,7 +109,7 @@
                 <version>${api-sdk.version}</version>
             </dependency>
             <dependency>
-                <groupId>edu.cqupt</groupId>
+                <groupId>vin.suki</groupId>
                 <artifactId>api-common</artifactId>
                 <version>${project.version}</version>
             </dependency>

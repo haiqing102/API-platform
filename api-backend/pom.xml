@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>edu.cqupt</groupId>
+        <groupId>vin.suki</groupId>
         <artifactId>api-platform</artifactId>
         <version>1.0</version>
         <relativePath>../pom.xml</relativePath>
@@ -56,7 +56,7 @@
             <artifactId>api-sdk</artifactId>
         </dependency>
         <dependency>
-            <groupId>edu.cqupt</groupId>
+            <groupId>vin.suki</groupId>
             <artifactId>api-common</artifactId>
         </dependency>
     </dependencies>
