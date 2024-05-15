@@ -400,7 +400,7 @@ public class InterfaceInfoController {
 			Map<String, Object> data = response.getData();
 
 			// 处理网关抛出的异常
-			if (data.get("code") != null && (double) data.get("code") == 500)
+			if (data.get("code") != null && (double) data.get("code") == 403)
 				return ResponseUtil.error(OPERATION_ERROR, (String) data.get("message"));
 
 			return ResponseUtil.success(data);

@@ -44,7 +44,7 @@ public class GatewayGlobalExceptionHandler implements ErrorWebExceptionHandler {
 			DataBufferFactory bufferFactory = response.bufferFactory();
 			try {
 				//返回响应结果
-				return bufferFactory.wrap(objectMapper.writeValueAsBytes(ResponseUtil.error(500, ex.getMessage())));
+				return bufferFactory.wrap(objectMapper.writeValueAsBytes(ResponseUtil.error(403, ex.getMessage())));
 			} catch (JsonProcessingException e) {
 				log.error("Error writing response", ex);
 				return bufferFactory.wrap(new byte[0]);
