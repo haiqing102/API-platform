@@ -22,7 +22,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				.excludePathPatterns("/interfaceInfo/list/page")
 				.excludePathPatterns("/interfaceInfo/get")
 				.excludePathPatterns("/interfaceInfo/get/searchText")
-				.excludePathPatterns("/order/notify/order");
+				.excludePathPatterns("/order/notify/order")
+				.excludePathPatterns("/doc.html") // knife4j接口文档
+				.excludePathPatterns("/v3/api-docs")
+				.excludePathPatterns("/swagger-resources")
+				.excludePathPatterns("/webjars/**");
 	}
 
 }
