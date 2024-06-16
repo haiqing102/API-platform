@@ -5,6 +5,6 @@ spring:
     active: prod
   cloud:
     nacos:
-      server-addr: xxxxx:8848
+      server-addr: xxx:8848
       config:
         file-extension: yaml

@@ -11,4 +11,4 @@ api:
 #支付宝支付配置（使用中）
 alipay:
   return-url: http://localhost:8000/recharge/list
-  notify-url: http://xxxxx/api/backend/order/notify/order
+  notify-url: http://bj.frp.one:12000/api/backend/order/notify/order

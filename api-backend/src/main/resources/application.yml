@@ -22,15 +22,15 @@ spring:
     store-type: redis
     timeout: 7d #一周
   redis:
-    host: xxxxx
+    host: xxx
     port: 6379
     database: 0
-    password: xxxxx
+    password: xxx
   mail:
     host: smtp.qq.com
-    username: xxxxx@qq.com
-    password: xxxxx
-    email-from: xxxxx@qq.com
+    username: xxx@qq.com
+    password: hwmrmqvaikvbdadf
+    email-from: xxx@qq.com
     properties:
       mail:
         smtp:
@@ -44,9 +44,9 @@ knife4j:
   basic:
     enable: true
     # Basic认证用户名
-    username: xxxxx
+    username: root
     # Basic认证密码
-    password: xxxxx
+    password: xxx
 #-------------------------------------------------------------
 mybatis-plus:
   configuration:
@@ -56,17 +56,17 @@ mybatis-plus:
 #腾讯云cos配置
 cos:
   client:
-    access-key: AKIDxxxxx2KUcZJvNcdP6a
-    secret-key: LSKyPefS2Oxxxxx1g8MTN7eKsL
-    region: ap-xxxxx
-    bucket: xxxxx
+    access-key: xxx
+    secret-key: xxx
+    region: ap-chongqing
+    bucket: api-xxx
 #-------------------------------------------------------------
 #支付宝支付配置（使用中）
 alipay:
-  app-id: 9021000xxxxx1
-  seller-id: 20887xxxxx6
-  ali-pay-public-key: MIIBIjANBgkqhkixxxxxQEAt32VSa6kjvrF8h3G1tUzSxxxxxDCs4XAaAiy0kiPHj7czDt7y3UuPle95zxBA2eoqquqP7WTkGIsft+xa4LwerFCCxNetU3trqNIOUdsDCFqMsT2KvBOjSLgD1sPPIbDniSODf7hRsj+Z3QU0l4h+fIkj06D85AvKu74Avoi4/M41H0m8rlw6xxrszIPUYC+f9U/e7pt8TWzB0KueWiQFga0t2s1k2+gXfTKe13HIs1veD7oIvx/P9ynjBd1To7kFbZXa5BhyqO4OhK5lf08hd2NJnWVlWaDAVDuPMsiSilCim0kdRM6gRfOrbNmtptLXJaePew4+wIDAQAB
-  private-key: MIIEvgIBADANBgkqhkiG9w0BAQEFAxxxxxAAoIBAQCsb9MEiiE8a5cfzE76RkimKxxxxxEgvLCZ5czkcrZyklz0GaeihmuMdVPcDHkdoBwRxi/EkK2Z2NReAWn2dTScYV6FXt4A1wSQJT/8HAFM0oe83KzRebwRGhjanpVXLekDx37nbHSdjXJdzZcHkcufPoKVtlpK0tUPVgvSiziSxSRgo+4Z86qhFnz/mTcpm+8pANpQ101KGZ5tVjcfNhTm9a1Si0HU96IuPI5DhQLQxWD3MmGmRqS9HylbYRqo1w5rbIsfht3TjvEyhJZv+9Mhe4W9GbnEyCSrs1ay6J+T8ISmjnp9JuJY4tN0vG1aQxahE/80CCTUncPsBVdYlstlAgMBAAECggEAI9SwsnbJZTauFmtr1dGY8v6FNkhna1gKElCP/MBhbPlA23AhR0JLQsp2fHkTCbblXkQiVOQDTr6hkk8U56N/JSeOboRB+Ua0qgczfn2LP51Xm0T3nCeBjsQvee4N9imSC7j+g7Qjn0FvDFLWGTqQZyykEdvsczPQFfm5RyyqusRo6QEfPCXii2+UtcTsxFvBWhI9mlnxKacAf6EoNs1NJvR3v+sQlesmJEDhuourh1Qzn01a6I/2GnTyQdj9tx8/uPpvH7EtNr0Fyv2vPJ/cPPgznqsVFxCKLrpgRG0XSRWEgZzA+d40zltOTtt//nD4LKcpq0n76xYz+fUQcLnUAQKBgQDYqlD0vTxAMAOdk6j6OIfYN2fHK6zpgIsOrfcYN21PzGzD/XfFGreLN1WK0H9KtAV9l1hqK3iP8zKt/yhOkwPOxTFfC63iEgPp6uhxVPUYx0bAMND3cOBEpjaj9jBOUr7zwVtDD2BS5oY/ezNfMxIECCbCA87v679WJXuq6IRe5QKBgQDLvfSs8MqKL8PNiZwMMQWLf6XwbobGhoSOy7W/clbjejohwjStGMZi2NfJcot9LbYFEigz5m4B8dUVOyZ+27ggBpcO3K/MHzGJcPoPB7fexL+lH21FRsDwPVifqQf0MrQcjEveiYANf/hBhVNjT+Q2UmgZ1qK4N4UnIJBSIg1ygQKBgHGRVL30MxCyGjMOoxQFba83233attfuOPWI2mwnIXUigiB5S75VMsAWURBiGVbe5cHfAskj4B4ULAxoIoiNJwHK+wYG6S4Go2aJay18irxiOAOlkuMgl21kcl+fO9LSLKU4RM3x0Vui2duMiHDuJBNY8nff5yh7Od+95gS/vCLBAoGBAKfhxGVknGA1b5BDndPl6P3DlwaA7IlVepD3hrFUFAipRJFgp2siiQYWS+jwe8QQEHYpOftaGrd7f+tYrCXIAvZQt9RFQI5f/b+U2lfcMkRbttbnCHEXFhBfXFFjROyRgxwq9rFOd7eoBPZoWAfzYsboLGNuGvLUvOE60fD7oj0BAoGBAIIP7e/Z3oNRcMnuEgliDS0kQQwOWe3C45zjKkRSG5kERW9ek/unYmX1AGXDDhpG/ymLgGkoX+0aB6ztxTrR6Cn7ouBMEO9qkQIeku5pDcdjZmuzytxyjM/oO0DddOvyMmp2Y6QFSpCIWUFmCrfVk/hQsUARh4Zn+6VT6ixjco/t
+  app-id: 902100xxx91
+  seller-id: 208xxx033607016
+  ali-pay-public-key: MIIBIjANBgkqhkixxxAMIIBCgKCAQEAxxxvrF8h3G1tUzSrYT4Kxrnivxxx4XAaAiy0kiPHj7czDt7y3UuPle95zxBA2eoqquqP7WTkGIsft+xa4LwerFCCxNetU3trqNIOUdsDCFqMsT2KvBOjSLgD1sPPIbDniSODf7hRsj+Z3QU0l4h+fIkj06D85AvKu74Avoi4/M41H0m8rlw6xxrszIPUYC+f9U/e7pt8TWzB0KueWiQFga0t2s1k2+gXfTKe13HIs1veD7oIvx/P9ynjBd1To7kFbZXa5BhyqO4OhK5lf08hd2NJnWVlWaDAVDuPMsiSilCim0kdRM6gRfOrbNmtptLXJaePew4+wIDAQAB
+  private-key: MIIEvgIBADANBgkqxxxQEFAASCBKgwggSkAgEAAoIBAxxx8a5cfzE76RkimK4qi5uEgxxxkcrZyklzxxxZ2NReAWn2dTScYV6FXt4A1wSQJT/8HAFM0oe83KzRebwRGhjanpVXLekDx37nbHSdjXJdzZcHkcufPoKVtlpK0tUPVgvSiziSxSRgo+4Z86qhFnz/mTcpm+8pANpQ101KGZ5tVjcfNhTm9a1Si0HU96IuPI5DhQLQxWD3MmGmRqS9HylbYRqo1w5rbIsfht3TjvEyhJZv+9Mhe4W9GbnEyCSrs1ay6J+T8ISmjnp9JuJY4tN0vG1aQxahE/80CCTUncPsBVdYlstlAgMBAAECggEAI9SwsnbJZTauFmtr1dGY8v6FNkhna1gKElCP/MBhbPlA23AhR0JLQsp2fHkTCbblXkQiVOQDTr6hkk8U56N/JSeOboRB+Ua0qgczfn2LP51Xm0T3nCeBjsQvee4N9imSC7j+g7Qjn0FvDFLWGTqQZyykEdvsczPQFfm5RyyqusRo6QEfPCXii2+UtcTsxFvBWhI9mlnxKacAf6EoNs1NJvR3v+sQlesmJEDhuourh1Qzn01a6I/2GnTyQdj9tx8/uPpvH7EtNr0Fyv2vPJ/cPPgznqsVFxCKLrpgRG0XSRWEgZzA+d40zltOTtt//nD4LKcpq0n76xYz+fUQcLnUAQKBgQDYqlD0vTxAMAOdk6j6OIfYN2fHK6zpgIsOrfcYN21PzGzD/XfFGreLN1WK0H9KtAV9l1hqK3iP8zKt/yhOkwPOxTFfC63iEgPp6uhxVPUYx0bAMND3cOBEpjaj9jBOUr7zwVtDD2BS5oY/ezNfMxIECCbCA87v679WJXuq6IRe5QKBgQDLvfSs8MqKL8PNiZwMMQWLf6XwbobGhoSOy7W/clbjejohwjStGMZi2NfJcot9LbYFEigz5m4B8dUVOyZ+27ggBpcO3K/MHzGJcPoPB7fexL+lH21FRsDwPVifqQf0MrQcjEveiYANf/hBhVNjT+Q2UmgZ1qK4N4UnIJBSIg1ygQKBgHGRVL30MxCyGjMOoxQFba83233attfuOPWI2mwnIXUigiB5S75VMsAWURBiGVbe5cHfAskj4B4ULAxoIoiNJwHK+wYG6S4Go2aJay18irxiOAOlkuMgl21kcl+fO9LSLKU4RM3x0Vui2duMiHDuJBNY8nff5yh7Od+95gS/vCLBAoGBAKfhxGVknGA1b5BDndPl6P3DlwaA7IlVepD3hrFUFAipRJFgp2siiQYWS+jwe8QQEHYpOftaGrd7f+tYrCXIAvZQt9RFQI5f/b+U2lfcMkRbttbnCHEXFhBfXFFjROyRgxwq9rFOd7eoBPZoWAfzYsboLGNuGvLUvOE60fD7oj0BAoGBAIIP7e/Z3oNRcMnuEgliDS0kQQwOWe3C45zjKkRSG5kERW9ek/unYmX1AGXDDhpG/ymLgGkoX+0aB6ztxTrR6Cn7ouBMEO9qkQIeku5pDcdjZmuzytxyjM/oO0DddOvyMmp2Y6QFSpCIWUFmCrfVk/hQsUARh4Zn+6VT6ixjco/t
 #-------------------------------------------------------------
 #微信支付配置（未使用）
 wx:
@@ -87,4 +87,4 @@ dubbo:
     name: dubbo
     port: -1
   registry:
-    address: nacos://xxxxxxxxxx
+    address: nacos://xxx:8848

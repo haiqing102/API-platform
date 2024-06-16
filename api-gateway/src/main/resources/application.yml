@@ -13,9 +13,9 @@ spring:
           uri: lb://api-interface
           predicates: Path=/api/interface/**
   redis:
-    host: xxxxx
+    host: xxx
     port: 6379
-    password: xxxxx
+    password: xxx
     database: 0
 #--------------------------------------
 logging:
@@ -34,4 +34,4 @@ dubbo:
     name: dubbo
     port: -1
   registry:
-    address: nacos://xxxxx
+    address: nacos://xxx:8848

@@ -3,6 +3,6 @@ spring:
     name: api-gateway
   cloud:
     nacos:
-      server-addr: xxxxx
+      server-addr: xxx:8848
       config:
         file-extension: yaml

@@ -1,14 +1,14 @@
 spring:
   datasource:
-    url: jdbc:mysql://xxxxx:3306/api_platform?useSSL=false
-    password: xxxxx
+    url: jdbc:mysql://xxx:3306/api_platform?useSSL=false
+    password: xxx
 #--------------------------------------------------------------
 #客户端SDK配置
 api:
   client:
-    gateway-host: https://xxxxx
+    gateway-host: https://api.suki.vin
 #--------------------------------------------------------------
 #支付宝支付配置（使用中）
 alipay:
-  return-url: https://xxxxx/recharge/list
-  notify-url: https://xxxxx/api/backend/order/notify/order
+  return-url: https://api.suki.vin/recharge/list
+  notify-url: https://api.suki.vin/api/backend/order/notify/order
